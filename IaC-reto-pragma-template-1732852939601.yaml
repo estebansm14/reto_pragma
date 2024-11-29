@@ -1,0 +1,259 @@
+---
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: "arn:aws:cloudformation:us-east-2:337909778222:generatedTemplate/f3e9078a-03e0-4220-9af4-7bea08c4304d"
+Resources:
+  S3Bucket00awsglueassets337909778222useast200nHNF2:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Retain"
+    Properties:
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        BlockPublicAcls: true
+      BucketName: "aws-glue-assets-337909778222-us-east-2"
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: "BucketOwnerEnforced"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: false
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: "AES256"
+  AthenaWorkGroup00primary00dvqTa:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Athena::WorkGroup"
+    DeletionPolicy: "Retain"
+    Properties:
+      WorkGroupConfiguration:
+        RequesterPaysEnabled: false
+        EnforceWorkGroupConfiguration: false
+        EngineVersion:
+          SelectedEngineVersion: "AUTO"
+        PublishCloudWatchMetricsEnabled: false
+        ResultConfiguration: {}
+      State: "ENABLED"
+      Tags: []
+      Name: "primary"
+  LogsLogStream00crawlerdata00GEG6Z:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Logs::LogStream"
+    DeletionPolicy: "Retain"
+    Properties:
+      LogStreamName: "crawler_data"
+      LogGroupName:
+        Ref: "LogsLogGroup00awsgluecrawlers0031Zaw"
+  IAMUser00dataingestion00mID3k:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::User"
+    DeletionPolicy: "Retain"
+    Properties:
+      Path: "/"
+      ManagedPolicyArns:
+      - Ref: "IAMManagedPolicy00policyserviceroleAWSGlueServiceRoleS3toGlueEZCRCs3Policy00PHmuB"
+      - "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3OutpostsFullAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3OutpostsReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy"
+      - "arn:aws:iam::aws:policy/service-role/AmazonGrafanaAthenaAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      - "arn:aws:iam::aws:policy/service-role/AWSQuicksightAthenaAccess"
+      - "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+      - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+      Policies:
+      - PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Resource: "*"
+            Action: "athena:*"
+            Effect: "Allow"
+          - Resource:
+            - "arn:aws:s3:::retopragmadatalakearchivos"
+            - "arn:aws:s3:::retopragmadatalakearchivos/*"
+            Action:
+            - "s3:PutObject"
+            - "s3:GetObject"
+            - "s3:ListBucket"
+            Effect: "Allow"
+        PolicyName: "acceso-athena"
+      - PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Resource: "*"
+            Action:
+            - "athena:StartQueryExecution"
+            - "athena:GetQueryResults"
+            - "athena:GetQueryExecution"
+            - "athena:ListNamedQueries"
+            - "athena:ListQueryExecutions"
+            Effect: "Allow"
+          - Resource:
+            - "arn:aws:s3:::retopragmadatalakearchivos/*"
+            - "arn:aws:s3:::retopragmadatalakearchivos"
+            Action:
+            - "s3:GetObject"
+            - "s3:ListBucket"
+            Effect: "Allow"
+          - Resource: "*"
+            Action:
+            - "glue:GetDatabase"
+            - "glue:GetDatabases"
+            - "glue:GetTable"
+            - "glue:GetTables"
+            - "glue:SearchTables"
+            Effect: "Allow"
+        PolicyName: "s3permisos"
+      UserName: "data_ingestion"
+      LoginProfile:
+        PasswordResetRequired: false
+      Tags:
+      - Value: "data-ingestion"
+        Key: "AKIAU5LH6A4XJCIMAWDE"
+  LogsLogStream00ingestiondata00LWmAG:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Logs::LogStream"
+    DeletionPolicy: "Retain"
+    Properties:
+      LogStreamName: "ingestion-data"
+      LogGroupName:
+        Ref: "LogsLogGroup00awsgluecrawlers0031Zaw"
+  LogsLogStream00crawleringestion00zUtBF:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Logs::LogStream"
+    DeletionPolicy: "Retain"
+    Properties:
+      LogStreamName: "crawler_ingestion"
+      LogGroupName:
+        Ref: "LogsLogGroup00awsgluecrawlers0031Zaw"
+  IAMManagedPolicy00policyserviceroleAWSGlueServiceRoleS3toGlueEZCRCs3Policy00PHmuB:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::ManagedPolicy"
+    DeletionPolicy: "Retain"
+    Properties:
+      ManagedPolicyName: "AWSGlueServiceRole-S3toGlue-EZCRC-s3Policy"
+      Path: "/service-role/"
+      Description: "This policy will be used for Glue Crawler and Job execution. Please\
+        \ do NOT delete!"
+      Groups: []
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Resource:
+          - "arn:aws:s3:::retopragmadatalakearchivos/raw/*"
+          Action:
+          - "s3:GetObject"
+          - "s3:PutObject"
+          Effect: "Allow"
+      Roles:
+      - "AWSGlueServiceRole-S3toGlue"
+      Users:
+      - "esteban_reto"
+      - "data_ingestion"
+  LogsLogGroup00awsgluecrawlers0031Zaw:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Logs::LogGroup"
+    DeletionPolicy: "Retain"
+    Properties:
+      LogGroupClass: "STANDARD"
+      LogGroupName: "/aws-glue/crawlers"
+      DataProtectionPolicy: {}
+  S3Bucket00retopragmadatalakearchivos00ElQuv:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Retain"
+    Properties:
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        BlockPublicAcls: true
+      BucketName: "retopragmadatalakearchivos"
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: "BucketOwnerEnforced"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: "AES256"
+      Tags:
+      - Value: "pragma"
+        Key: "reto"
+  LogsLogStream00crawlerrawdata008HiUW:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::Logs::LogStream"
+    DeletionPolicy: "Retain"
+    Properties:
+      LogStreamName: "crawler-raw-data"
+      LogGroupName:
+        Ref: "LogsLogGroup00awsgluecrawlers0031Zaw"
+  IAMRole00AWSGlueServiceRoleS3toGlue00xL1t1:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::Role"
+    DeletionPolicy: "Retain"
+    Properties:
+      Path: "/service-role/"
+      ManagedPolicyArns:
+      - Ref: "IAMManagedPolicy00policyserviceroleAWSGlueServiceRoleS3toGlueEZCRCs3Policy00PHmuB"
+      - "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3OutpostsFullAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3OutpostsReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy"
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      - "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
+      - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+      MaxSessionDuration: 3600
+      RoleName: "AWSGlueServiceRole-S3toGlue"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Action: "sts:AssumeRole"
+          Effect: "Allow"
+          Principal:
+            Service: "glue.amazonaws.com"
+  IAMUser00estebanreto00Ycyfr:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::IAM::User"
+    DeletionPolicy: "Retain"
+    Properties:
+      Path: "/"
+      ManagedPolicyArns:
+      - Ref: "IAMManagedPolicy00policyserviceroleAWSGlueServiceRoleS3toGlueEZCRCs3Policy00PHmuB"
+      - "arn:aws:iam::aws:policy/AWSLakeFormationDataAdmin"
+      - "arn:aws:iam::aws:policy/IAMUserChangePassword"
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      - "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
+      - "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+      Policies:
+      - PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Resource: "*"
+            Action:
+            - "athena:StartQueryExecution"
+            - "athena:GetQueryResults"
+            - "athena:GetQueryExecution"
+            - "athena:ListNamedQueries"
+            - "athena:ListQueryExecutions"
+            Effect: "Allow"
+          - Resource:
+            - "arn:aws:s3:::retopragmadatalakearchivos/*"
+            - "arn:aws:s3:::retopragmadatalakearchivos"
+            Action:
+            - "s3:GetObject"
+            - "s3:ListBucket"
+            Effect: "Allow"
+          - Resource: "*"
+            Action:
+            - "glue:GetDatabase"
+            - "glue:GetDatabases"
+            - "glue:GetTable"
+            - "glue:GetTables"
+            - "glue:SearchTables"
+            Effect: "Allow"
+        PolicyName: "s3permisos"
+      UserName: "esteban_reto"
+      LoginProfile:
+        PasswordResetRequired: false
